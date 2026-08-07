@@ -3,7 +3,7 @@ name: Build anixart_ios IPA
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Ручной запуск
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,9 +17,14 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
       - name: Build and Archive
         run: |
-          # Собираем xcode-архив из корня репозитория
           xcodebuild archive \
             -project "anixart_ios.xcodeproj" \
             -scheme "anixart_ios" \
