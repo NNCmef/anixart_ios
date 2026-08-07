@@ -1,42 +1,25 @@
-name: Build iOS unsigned IPA
+name: Build anixart_ios IPA
 
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Позволяет запускать сборку вручную из вкладки Actions
+  workflow_dispatch: # Ручной запуск
 
 jobs:
   build:
-    name: Build and Export IPA
+    name: Build and Package IPA
     runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Выбираем актуальную версию Xcode (по умолчанию на macos-latest стоит стабильная)
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
 
-      - name: Create ExportOptions.plist
-        run: |
-          cat <<EOF > ExportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>ad-hoc</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>compileBitcode</key>
-              <false/>
-          </dict>
-          </plist>
-          EOF
-
       - name: Build and Archive
         run: |
+          # Собираем xcode-архив из корня репозитория
           xcodebuild archive \
             -project "anixart_ios.xcodeproj" \
             -scheme "anixart_ios" \
@@ -46,19 +29,16 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_IDENTITY=""
 
-      - name: Export IPA
+      - name: Manually Package IPA for Sideloadly
         run: |
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportPath $PWD/build/ipa \
-            -exportOptionsPlist ExportOptions.plist \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_IDENTITY=""
+          mkdir -p build/ipa/Payload
+          cp -r build/App.xcarchive/Products/Applications/*.app build/ipa/Payload/
+          cd build/ipa
+          zip -r anixart_ios.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-ipa
-          path: build/ipa/*.ipa
+          name: anixart_ios-ipa
+          path: build/ipa/anixart_ios.ipa 
           retention-days: 7
