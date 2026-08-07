@@ -1,0 +1,19 @@
+name: anixart_ios
+options:
+  bundleIdPrefix: com.anixart
+targets:
+  anixart_ios:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources: [anixart_ios]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+    info:
+      properties:
+        # Разрешаем запросы к твоему локальному HTTP-бэкенду
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
