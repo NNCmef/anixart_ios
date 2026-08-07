@@ -4,7 +4,7 @@ class APIService {
     static let shared = APIService()
     
     // ВАЖНО: ЗАМЕНИ 192.168.X.X НА АДРЕС СВОЕГО КОМПА
-    private let baseURL = "http://192.168.1.100:8000/api" 
+    private let baseURL = "http://192.168.1.62:8000/api" 
     
     func searchAnime(query: String) async throws -> [Anime] {
         guard let urlString = "\(baseURL)/search?q=\(query)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
